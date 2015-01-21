@@ -298,14 +298,17 @@ fil2.open(cnd_file);	#load the item file data into the input file
 current_filename2 = fil2.get_line();	#get the first line of the condition file (column headers)
 int num_cnds = int(double(current_filename2.substring(current_filename2.find("totalconditions=")+16,3)));#assign how many cnds there are to a variable
 int test0_index = current_filename2.find("test0"); # Averted gaze face image
-int test0_index = current_filename2.find("test1"); # Direct gaze face image
+int test1_index = current_filename2.find("test1"); # Direct gaze face image
+int test2_index = current_filename2.find("test2"); # Duration of direct gaze bout
 array<string>cndA[num_cnds];       #create an array which will contain the item number for the averted gaze face in each condition  			
-array<string>cndD[num_cnds];       #create an array which will contain the item number for the direct gaze face in  each condition  			
+array<string>cndD[num_cnds];       #create an array which will contain the item number for the direct gaze face in each condition  			
+array<int>boutDuration[num_cnds];  #create an array which will contain the duration of direct gaze bouts for the direct gaze face in each condition  
 
 loop i = 1 until i>num_cnds begin	#loop through each line in the cnd file
 	current_filename2 = fil2.get_line();	#get the list of characters that compose the current line in the cnd file  
 	cndA[i] = current_filename2.substring(test0_index-1,3);	#get item number for averted gaze image (not the condition number) from that line
-	cndD[i] = current_filename2.substring(test1_index-1,3);	#get item number for direct gaze image (not the condition number) from that line		
+	cndD[i] = current_filename2.substring(test1_index-1,3);	#get item number for direct gaze image (not the condition number) from that line
+	boutDuration[i] = int(current_filename2.substring(test2_index-1,4));	#get duration of direct gaze bout for direct gaze image from that line
    i = i+1;  #increment the counter                           
 end;
 
@@ -413,10 +416,10 @@ int current_trial;	#create an integer counter for the trial number (# times each
 int current_cnd;	#create an integer counter for the current condition being shown
 array<int>cnds_to_show2[0];	#create an integer array in which we will store the randomized condition numbers
 
-array<int>cnd_correct[cnd.count()];	#create an array which will count the number of times has been correctly performed
-cnd_correct.fill(1,cnd.count(),0,0);	#initialize to zero the number of times each cnd has been correctly performed
-array<int>cnd_times_shown[cnd.count()];	#create an array which will count the number of times each cnd has been shown  
-cnd_times_shown.fill(1,cnd.count(),0,0);	#initialize to zero the number of times each cnd has been shown
+array<int>cnd_correct[cndA.count()];	#create an array which will count the number of times has been correctly performed
+cnd_correct.fill(1,cndA.count(),0,0);	#initialize to zero the number of times each cnd has been correctly performed
+array<int>cnd_times_shown[cndA.count()];	#create an array which will count the number of times each cnd has been shown  
+cnd_times_shown.fill(1,cndA.count(),0,0);	#initialize to zero the number of times each cnd has been shown
 int times_fix_shown = 0;	#create an integer that will count the number of times a cue has been shown, initialize to zero
 int times_fix_achieved = 0;	#create an integer that will count the number of times a cue has been achieved, initialize to zero
 double overall_cnd_correct = 0.0;	#create an integer for the number of correctly performed cnds overall; initialize to zero
@@ -455,16 +458,26 @@ loop current_trial = 1 until current_trial > num_trials begin
 		trialCounter[cnds_to_show2[current_cnd]] = trialCounter[cnds_to_show2[current_cnd]]+1;
 
 
-		placeholder.set_filename(items[int(double(cnd[cnds_to_show2[1]].substring(1,3)))]); #get the sample item filename and set it to the experimenters monitor		
-		image_bmp.load();	#load the sample item filename for display on the experimenters monitor
-		image_bmp2.set_filename(items[int(double(cnd[cnds_to_show2[1]].substring(1,3)))]); #get the sample item filename and set it to the monkeys monitor
-		image_bmp2.load();	#load the sample item filename for display on the monkeys monitor
-
-		double w = image_bmp.width(); double h = image_bmp.height();
-		imageBoundary.set_height(int(h)+2*imagewin); # set the height boundary of the fixspot (the extra space the monkey is allowed)
-		imageBoundary.set_width(int(w)+2*imagewin); # set the width boundary of the fixspot (the extra space the monkey is allowed)
-		imageBoundaryBlack.set_height(int(h)+2*imagewin-2); # the above two lines will set the red box height, this is setting the black box height(see picture code for details)
-		imageBoundaryBlack.set_width(int(w)+2*imagewin-2); # the above two lines will st the red box width, this is setting the black box width(see picture code for details)
+		placeholderA1.set_filename(items[int(double(cndA[cnds_to_show2[1]].substring(1,3)))]); #get the sample item filename and set it to the experimenters monitor		
+		placeholderA1.load();	#load the averted gaze filename for display on the monkeys monitor
+		placeholderA2.set_filename(items[int(double(cndA[cnds_to_show2[1]].substring(1,3)))]); #get the sample item filename and set it to the experimenters monitor		
+		placeholderA2.load();	#load the averted gaze filename for display on the experimenters monitor
+		
+		placeholderD1.set_filename(items[int(double(cndD[cnds_to_show2[1]].substring(1,3)))]); #get the sample item filename and set it to the experimenters monitor		
+		placeholderD1.load();	#load the averted gaze filename for display on the monkeys monitor
+		placeholderD2.set_filename(items[int(double(cndD[cnds_to_show2[1]].substring(1,3)))]); #get the sample item filename and set it to the experimenters monitor		
+		placeholderD2.load();	#load the averted gaze filename for display on the experimenters monitor
+		
+		double w = placeholderA1.width(); double h = placeholderA1.height();
+		imageBoundaryA.set_height(int(h)+2*imagewin); # set the height boundary of the fixspot (the extra space the monkey is allowed)
+		imageBoundaryA.set_width(int(w)+2*imagewin); # set the width boundary of the fixspot (the extra space the monkey is allowed)
+		imageBoundaryBlackA.set_height(int(h)+2*imagewin-2); # the above two lines will set the red box height, this is setting the black box height(see picture code for details)
+		imageBoundaryBlackA.set_width(int(w)+2*imagewin-2); # the above two lines will st the red box width, this is setting the black box width(see picture code for details)
+		
+		imageBoundaryD.set_height(int(h)+2*imagewin); # set the height boundary of the fixspot (the extra space the monkey is allowed)
+		imageBoundaryD.set_width(int(w)+2*imagewin); # set the width boundary of the fixspot (the extra space the monkey is allowed)
+		imageBoundaryBlackD.set_height(int(h)+2*imagewin-2); # the above two lines will set the red box height, this is setting the black box height(see picture code for details)
+		imageBoundaryBlackD.set_width(int(w)+2*imagewin-2); # the above two lines will st the red box width, this is setting the black box width(see picture code for details)
 
 
 		#these lines will make compile the text that will be displayed throughout the experiment on the experimenter's monitor
@@ -578,24 +591,25 @@ loop current_trial = 1 until current_trial > num_trials begin
 				cnd_times_shown[cnds_to_show2[1]] = cnd_times_shown[cnds_to_show2[1]]+1;
 				overall_cnd_shown = overall_cnd_shown+1.0;
 				fixGood=fixGood+1.0;
-				image_averted1.present(); #present the averted gaze image
-				image_averted2.present();
+				image_averted1.present(); #present the averted gaze image: monkey monitor
+				image_averted2.present(); #present the averted gaze image: experimenter monitor
 				encode(17); # encode averted gaze image on
-				encode(1000+int(double(cnd[cnds_to_show2[1]].substring(1,3))));
+				encode(1000+int(double(cndA[cnds_to_show2[1]].substring(1,3))));
 				clockticker = clock.time(); # get the time
 				int trialStart; int trialEnd; int directStart; int directEnd;
 				trialStart = clock.time(); # start time for trial
 				trialEnd = clockticker + trialDuration; # stop time for trial
 				int timeInEye; # time spent viewing eye region (rectangle of width eyesW and height eyesH centered at 0,0)
 				int timeOutEye; # time spent viewing non-eye region
+				int refractoryStart; int refractoryEnd;
 				# contine to monitor the eye until it leaves the image or the timer runs out
 				loop until clock.time() >= trialEnd
 				begin
 					iscan_x = iscan.read_analog(idX)*ratioX; # get the X eye position
 					iscan_y = iscan.read_analog(idY)*ratioY; # get the Y eye position
-					image_copy.set_part_x( 4, iscan_x ); # set the X eye position to eyeposition of the picture
-					image_copy.set_part_y( 4, iscan_y ); # set the Y eye position to eyeposition of the picture
-					image_copy.present(); # show the eye position on the monitor
+					image_averted2.set_part_x( 4, iscan_x ); # set the X eye position to eyeposition of the picture
+					image_averted2.set_part_y( 4, iscan_y ); # set the Y eye position to eyeposition of the picture
+					image_averted2.present(); # show the eye position on the monitor
 					
 					# Keep track of how much time is spent within eye region
 					if iscan_x < eyesW && iscan_x > -eyesW && iscan_y < eyesH && iscan_y > -eyesH then
@@ -610,10 +624,10 @@ loop current_trial = 1 until current_trial > num_trials begin
 						image_direct2.present();
 						encode(19); # encode direct gaze image on
 						directStart = clock.time(); # get time that direct gaze bout started
-						directEnd = directStart + boutDuration; # set time at which direct gaze bout will end and switch gaze to averted
+						directEnd = directStart + boutDuration[current_cnd]; # set time at which direct gaze bout will end and switch gaze to averted
 						
 						#/\/\/\/\/\/\/\/\ RETURN TO AVERTED GAZE /\/\/\/\/\/\/\/\
-						if clock.time() >= directEnd # time elapsed since direct gaze bout started exceeds specified direct gaze bout length
+						if clock.time() >= directEnd then # time elapsed since direct gaze bout started exceeds specified direct gaze bout length
 							encode(20) # encode direct gaze image off
 							image_averted1.present(); # show the averted gaze image
 							image_averted2.present();
@@ -624,7 +638,7 @@ loop current_trial = 1 until current_trial > num_trials begin
 							refractoryEnd = refractoryStart + refractoryDuration; # set time at which averted gaze will become eligible for direct gaze bout
 							
 							#/\/\/\/\/\/\/\/\ END REFRACTORY PERIOD & RETURN TO AVERTED, DIRECT-GAZE-ELIGIBLE STATE /\/\/\/\/\/\/\/\
-							if clock.time() >= refractoryEnd
+							if clock.time() >= refractoryEnd then
 								timeInEye = 0; # reset timer, break the loop for showing direct gaze
 							end;
 						end;
